@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Editar Equipamento{% endblock %}
+{% block content %}
+<div class="container-main">
+    <h2 class="mb-4"><i class="fas fa-edit"></i> Editar Equipamento</h2>
+    <form method="post">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" value="{{ equipamento.nome }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tipo</label>
+                <input type="text" name="tipo" class="form-control" value="{{ equipamento.tipo }}" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Marca</label>
+                <input type="text" name="marca" class="form-control" value="{{ equipamento.marca }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Modelo</label>
+                <input type="text" name="modelo" class="form-control" value="{{ equipamento.modelo }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nº Série</label>
+                <input type="text" name="numero_serie" class="form-control" value="{{ equipamento.numero_serie }}">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Data de Aquisição</label>
+                <input type="date" name="data_aquisicao" class="form-control" value="{{ equipamento.data_aquisicao|default('', true) }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="ativo" {% if equipamento.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                    <option value="emprestado" {% if equipamento.status == 'emprestado' %}selected{% endif %}>Emprestado</option>
+                    <option value="manutencao" {% if equipamento.status == 'manutencao' %}selected{% endif %}>Manutenção</option>
+                    <option value="baixado" {% if equipamento.status == 'baixado' %}selected{% endif %}>Baixado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Localização</label>
+                <input type="text" name="localizacao" class="form-control" value="{{ equipamento.localizacao }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Observações</label>
+            <textarea name="observacoes" class="form-control">{{ equipamento.observacoes }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button>
+        <a href="{{ url_for('listar_equipamentos') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

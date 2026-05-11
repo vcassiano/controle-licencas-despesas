@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <h1 class="text-white">
+            <i class="fas fa-dollar-sign"></i> Gerenciamento de Despesas
+        </h1>
+    </div>
+    <div class="col-lg-4 text-lg-end">
+        <a href="/despesas/adicionar" class="btn btn-light btn-lg">
+            <i class="fas fa-plus"></i> Nova Despesa
+        </a>
+    </div>
+</div>
+
+{% if despesas %}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-tag"></i> Categoria</th>
+                        <th><i class="fas fa-dollar-sign"></i> Valor</th>
+                        <th><i class="fas fa-calendar"></i> Data</th>
+                        <th><i class="fas fa-comment"></i> Descrição</th>
+                        <th><i class="fas fa-budget"></i> Orçamento Anual</th>
+                        <th><i class="fas fa-cogs"></i> Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despesa in despesas %}
+                    <tr>
+                        <td>
+                            <span class="badge" style="background: {% if despesa.categoria == 'software' %}#667eea{% elif despesa.categoria == 'hardware' %}#764ba2{% else %}#f59e0b{% endif %}">
+                                {{ despesa.categoria.upper() }}
+                            </span>
+                        </td>
+                        <td><strong>{{ despesa.valor|brl }}</strong></td>
+                        <td>{{ despesa.data.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ despesa.descricao }}</td>
+                        <td>{{ despesa.orcamento_anual|brl }}</td>
+                        <td>
+                            <a href="/despesas/editar/{{ despesa.id }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="/despesas/excluir/{{ despesa.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza?')">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">Nenhuma despesa registrada. <a href="/despesas/adicionar">Adicione uma agora!</a></p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,171 @@
+/* Tema Growth Supplements - TI Control */
+
+/* Cores principais */
+:root {
+    --primary-cyan: #0099CC;
+    --dark-bg: #1a1a1a;
+    --light-text: #aaa;
+    --accent-yellow: #FFB84D;
+    --danger-red: #FF3333;
+}
+
+/* Melhorias de animação */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(0, 153, 204, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(0, 153, 204, 0.6);
+    }
+}
+
+/* Aplicar animações */
+.navbar {
+    animation: slideInDown 0.5s ease-out;
+}
+
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.btn-primary:active {
+    animation: glowPulse 0.5s ease;
+}
+
+/* Badges com estilo Growth */
+.badge {
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    border-radius: 20px;
+}
+
+.badge-ativa {
+    background: linear-gradient(135deg, #0099CC 0%, #00AADD 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 153, 204, 0.3);
+}
+
+.badge-expirada {
+    background: #FF3333;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 51, 51, 0.3);
+}
+
+/* Melhorias de input */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0099CC;
+    box-shadow: 0 0 0 0.3rem rgba(0, 153, 204, 0.15);
+}
+
+/* Cards de estatísticas com efeito hover */
+.stats-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 153, 204, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.stats-card:hover::before {
+    left: 100%;
+}
+
+/* Tabelas com estilo melhorado */
+.table {
+    color: #333;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(0, 153, 204, 0.05);
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(0, 153, 204, 0.15);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+/* Botões com efeito ripple */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Upload area com estilo */
+.upload-area {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.upload-area i {
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover i {
+    transform: scale(1.2) rotate(10deg);
+    color: #00A651;
+}
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .stats-card {
+        margin-bottom: 15px;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+    }
+}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Orçamento{% endblock %}
+
+{% block content %}
+<div class="container-main">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Cabeçalho -->
+            <div class="mb-4">
+                <h1 class="display-6 fw-bold">
+                    <i class="fas fa-edit"></i> Editar Orçamento
+                </h1>
+                <p class="text-muted">Atualize o orçamento planejado para a categoria</p>
+            </div>
+
+            <!-- Card do Formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tag"></i>
+                        {% if orcamento.categoria == 'software' %}
+                            Software
+                        {% elif orcamento.categoria == 'hardware' %}
+                            Hardware
+                        {% else %}
+                            Nuvem
+                        {% endif %}
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <!-- Informações Atual -->
+                    <div class="alert alert-light border-left border-primary mb-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Orçado Atual</p>
+                                <h4 class="text-primary">R$ {{ "%.2f"|format(orcamento.orcado) }}</h4>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Realizado</p>
+                                <h4 class="text-success">R$ {{ "%.2f"|format(orcamento.realizado) }}</h4>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Variação</p>
+                                <h5 {% if orcamento.variacao_percentual() < 0 %}class="text-success"{% elif orcamento.variacao_percentual() <= 10 %}class="text-warning"{% else %}class="text-danger"{% endif %}>
+                                    {{ "%.1f"|format(orcamento.variacao_percentual()) }}%
+                                </h5>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Status</p>
+                                {% if orcamento.status_orcamento() == 'saudavel' %}
+                                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> Saudável</span>
+                                {% elif orcamento.status_orcamento() == 'normal' %}
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Normal</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Alerta</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário -->
+                    <form method="POST" class="needs-validation">
+                        <div class="mb-3">
+                            <label for="orcado" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> Novo Valor Orçado
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-lg" 
+                                    id="orcado" 
+                                    name="orcado" 
+                                    value="{{ orcamento.orcado }}" 
+                                    step="0.01" 
+                                    min="0" 
+                                    required
+                                    placeholder="0.00">
+                            </div>
+                            <small class="form-text text-muted">
+                                Digite o novo valor do orçamento planejado para este mês
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="text-muted small">
+                                <strong>Período:</strong> 
+                                {% set nomes_meses = {1:'Janeiro', 2:'Fevereiro', 3:'Março', 4:'Abril', 5:'Maio', 6:'Junho', 7:'Julho', 8:'Agosto', 9:'Setembro', 10:'Outubro', 11:'Novembro', 12:'Dezembro'} %}
+                                {{ nomes_meses[orcamento.mes] }} de {{ orcamento.ano }}
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('visualizar_orcamento') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Informação Adicional -->
+                    <hr class="my-4">
+                    <div class="alert alert-info mb-0">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb"></i> Dica
+                        </h6>
+                        <p class="mb-0 small">
+                            Use este formulário para ajustar o orçamento planejado. 
+                            O valor "Realizado" é atualizado automaticamente com base nas despesas registradas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão Voltar -->
+            <div class="mt-4">
+                <a href="{{ url_for('visualizar_orcamento') }}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left"></i> Voltar para Orçamento
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

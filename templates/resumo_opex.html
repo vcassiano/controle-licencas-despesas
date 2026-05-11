@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumo Opex</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        h1 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        th, td { padding: 10px 8px; border: 1px solid #e1e1e1; text-align: right; }
+        th { background: #eaf1fb; color: #2c3e50; text-align: center; }
+        tr:nth-child(even) { background: #f4f8fb; }
+        tr.total { background: #d1e7dd; font-weight: bold; color: #14532d; }
+        td:first-child, th:first-child { text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resumo Gerencial Opex 2025</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mês</th>
+                    <th>Orçado (R$)</th>
+                    <th>Realizado (R$)</th>
+                    <th>Delta (R$)</th>
+                    <th>% Delta</th>
+                    <th>Variação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for linha in dados %}
+                <tr>
+                    <td>{{ linha[0] }}</td>
+                    <td>{{ linha[1]|float|round(2) }}</td>
+                    <td>{{ linha[2]|float|round(2) }}</td>
+                    <td>{{ linha[3]|float|round(2) }}</td>
+                    <td>{{ (linha[4]|float * 100)|round(2) }}%</td>
+                    <td>{{ linha[5] }}</td>
+                </tr>
+                {% endfor %}
+                {% if total_anual %}
+                <tr class="total">
+                    <td>{{ total_anual[0] }}</td>
+                    <td>{{ total_anual[1]|float|round(2) }}</td>
+                    <td>{{ total_anual[2]|float|round(2) }}</td>
+                    <td>{{ total_anual[3]|float|round(2) }}</td>
+                    <td>{{ (total_anual[4]|float * 100)|round(2) }}%</td>
+                    <td>{{ total_anual[5] }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

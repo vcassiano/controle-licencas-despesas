@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Gestão de Ativos</h1>
+    {% if erro %}
+        <div class="alert alert-danger">Erro ao carregar colunas: {{ erro }}</div>
+    {% endif %}
+    {% if colunas and not erro %}
+        <h3>Colunas encontradas na planilha:</h3>
+        <ul>
+        {% for coluna in colunas %}
+            <li>{{ coluna }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhuma coluna encontrada ou erro ao processar a planilha.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Controle de Orçamento{% endblock %}
+
+{% block content %}
+<div class="container-main">
+    <!-- Título da Página -->
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-chart-line"></i> Controle de Orçamento
+        </h1>
+        <p class="text-muted">Acompanhe orçado vs realizado e previsões dos próximos meses</p>
+    </div>
+
+    <!-- Filtro de Mês/Ano -->
+    <form method="get" class="row g-3 align-items-end mb-3">
+        <div class="col-md-3">
+            <label for="mes" class="form-label">Mês</label>
+            <select class="form-select" id="mes" name="mes">
+                {% for num, nome in meses_disponiveis %}
+                    <option value="{{ num }}" {% if num|string == mes_atual|string %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="ano" class="form-label">Ano</label>
+            <select class="form-select" id="ano" name="ano">
+                {% for ano in anos_disponiveis %}
+                    <option value="{{ ano }}" {% if ano == ano_atual %}selected{% endif %}>{{ ano }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+        </div>
+    </form>
+    <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="card stats-card bg-light">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted">Orçado OPEX (planilha):</span>
+                            <span class="fw-bold text-primary">{{ total_opex_planilha|brl }}</span>
+                        </div>
+                        <div>
+                            <span class="text-muted">Orçado CAPEX (planilha):</span>
+                            <span class="fw-bold text-info">{{ total_capex_planilha|brl }}</span>
+                        </div>
+                        <div>
+                            <span class="text-muted">Total Orçado (planilha):</span>
+                            <span class="fw-bold text-success">{{ total_planilha|brl }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Orçado (Mês)</p>
+                            <h3 class="fw-bold text-primary">
+                                {{ totais.orcado|brl }}
+                            </h3>
+                        </div>
+                        <div class="text-primary" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Realizado (Mês)</p>
+                            <h3 class="fw-bold text-success">
+                                {{ totais.realizado|brl }}
+                            </h3>
+                        </div>
+                        <div class="text-success" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Variação</p>
+                            <h3 class="fw-bold {% if totais.variacao < 0 %}text-success{% elif totais.variacao <= 100 %}text-warning{% else %}text-danger{% endif %}">
+                                {% if totais.variacao < 0 %}
+                                    -{{ (-totais.variacao)|brl }}
+                                {% else %}
+                                    +{{ totais.variacao|brl }}
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div {% if totais.variacao < 0 %}class="text-success"{% else %}class="text-danger"{% endif %} style="font-size: 2.5rem; opacity: 0.2;">
+                            {% if totais.variacao < 0 %}
+                                <i class="fas fa-arrow-down"></i>
+                            {% else %}
+                                <i class="fas fa-arrow-up"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Variação %</p>
+                            <h3 class="fw-bold {% if totais.variacao_pct < 0 %}text-success{% elif totais.variacao_pct <= 10 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ "%.1f"|format(totais.variacao_pct) }}%
+                            </h3>
+                        </div>
+                        <div {% if totais.variacao_pct < 0 %}class="text-success"{% else %}class="text-danger"{% endif %} style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Totais por Tipo de Despesa -->
+    <div class="row mb-4">
+        <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">OPEX (Orçamento Operacional)</p>
+                            <h4 class="fw-bold text-primary">
+                                {{ totais_tipo['OPEX'].orcado|brl }} / {{ totais_tipo['OPEX'].realizado|brl }}
+                            </h4>
+                        </div>
+                        <div class="text-primary" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">CAPEX (Investimento de Capital)</p>
+                            <h4 class="fw-bold text-success">
+                                {{ totais_tipo['CAPEX'].orcado|brl }} / {{ totais_tipo['CAPEX'].realizado|brl }}
+                            </h4>
+                        </div>
+                        <div class="text-success" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Orçamentos por Categoria -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table"></i> Orçamentos - {{ nomes_meses[mes_atual] }}/{{ ano_atual }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Tipo</th>
+                            <th class="text-end">Orçado</th>
+                            <th class="text-end">Realizado</th>
+                            <th class="text-end">Diferença</th>
+                            <th class="text-center">Variação %</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for orcamento in orcamentos %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-tag"></i>
+                                <span class="fw-bold">
+                                    {% if orcamento.categoria == 'software' %}
+                                        Software
+                                    {% elif orcamento.categoria == 'hardware' %}
+                                        Hardware
+                                    {% else %}
+                                        Nuvem
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if orcamento.tipo == 'CAPEX' %}
+                                    <span class="badge bg-secondary">CAPEX</span>
+                                {% else %}
+                                    <span class="badge bg-info text-dark">OPEX</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">{{ orcamento.orcado|brl }}</td>
+                            <td class="text-end">{{ orcamento.realizado|brl }}</td>
+                            <td class="text-end">
+                                {% set diferenca = orcamento.realizado - orcamento.orcado %}
+                                <span {% if diferenca < 0 %}class="text-success"{% elif diferenca <= (orcamento.orcado * 0.1) %}class="text-warning"{% else %}class="text-danger"{% endif %}>
+                                    {% if diferenca < 0 %}
+                                        -{{ (-diferenca)|brl }}
+                                    {% else %}
+                                        +{{ diferenca|brl }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge {% if orcamento.variacao_percentual() < 0 %}bg-success{% elif orcamento.variacao_percentual() <= 10 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                    {{ "%.1f"|format(orcamento.variacao_percentual()) }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% if orcamento.status_orcamento() == 'saudavel' %}
+                                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> Saudável</span>
+                                {% elif orcamento.status_orcamento() == 'normal' %}
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Normal</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Alerta</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ url_for('editar_orcamento', id=orcamento.id) }}" 
+                                   class="btn btn-sm btn-primary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhamento linha a linha do mês selecionado -->
+    {% if detalhamento_linhas %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> Detalhamento de Pagamentos - {{ nomes_meses[mes_atual]|default('Todos') }}/{{ ano_atual }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fornecedor</th>
+                            <th>Descrição</th>
+                            <th class="text-end">Orçado</th>
+                            <th class="text-end">Realizado</th>
+                            <th class="text-end">Variação (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for linha in detalhamento_linhas %}
+                        <tr>
+                            <td>{{ linha.fornecedor }}</td>
+                            <td>{{ linha.descricao_item }}</td>
+                            <td class="text-end">{{ linha.orcado|brl }}</td>
+                            <td class="text-end">{{ linha.realizado|brl }}</td>
+                            <td class="text-end">
+                                {% if linha.variacao < 0 %}
+                                    <span class="text-success">-{{ (-linha.variacao)|brl }}</span>
+                                {% else %}
+                                    <span class="text-danger">+{{ linha.variacao|brl }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Previsão dos Próximos 3 Meses -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-crystal-ball"></i> Previsão - Próximos 3 Meses
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mês</th>
+                            <th class="text-end">Software</th>
+                            <th class="text-end">Hardware</th>
+                            <th class="text-end">Nuvem</th>
+                            <th class="text-end">Total Previsto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mes_str, categorias in forecast.items() %}
+                            {% set parts = mes_str.split('-') %}
+                            {% set total_mes = categorias.get('software', 0) + categorias.get('hardware', 0) + categorias.get('nuvem', 0) %}
+                        <tr>
+                            <td>
+                                <strong>{{ nomes_meses[parts[1]|int] }}/{{ parts[0] }}</strong>
+                            </td>
+                            <td class="text-end">{{ categorias.get('software', 0)|brl }}</td>
+                            <td class="text-end">{{ categorias.get('hardware', 0)|brl }}</td>
+                            <td class="text-end">{{ categorias.get('nuvem', 0)|brl }}</td>
+                            <td class="text-end">
+                                <strong class="text-primary">{{ total_mes|brl }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="fas fa-info-circle"></i>
+                <strong>Nota:</strong> As previsões são calculadas com base na média dos últimos 3 meses de despesas por categoria.
+            </div>
+        </div>
+    </div>
+
+    <!-- Link para Relatório Detalhado -->
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('relatorio_orcamento') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-file-alt"></i> Ver Relatório Detalhado
+        </a>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-left: 4px solid var(--primary-color);
+        border-right: none;
+        border-top: none;
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

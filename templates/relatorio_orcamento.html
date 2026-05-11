@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório de Orçamento{% endblock %}
+
+{% block content %}
+<div class="container-main">
+    <!-- Título da Página -->
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-file-alt"></i> Relatório de Orçamento
+        </h1>
+        <p class="text-muted">Análise detalhada dos últimos 6 meses de orçamento vs realizado</p>
+    </div>
+
+    <!-- Resumo de Variação Média por Categoria -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-laptop"></i> Variação Software
+                            </p>
+                            <h3 class="fw-bold {% if variacao_media['software'] < 0 %}text-success{% elif variacao_media['software'] <= 10 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ "%.1f"|format(variacao_media['software']) }}%
+                            </h3>
+                        </div>
+                        <div class="text-muted" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-desktop"></i> Variação Hardware
+                            </p>
+                            <h3 class="fw-bold {% if variacao_media['hardware'] < 0 %}text-success{% elif variacao_media['hardware'] <= 10 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ "%.1f"|format(variacao_media['hardware']) }}%
+                            </h3>
+                        </div>
+                        <div class="text-muted" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-cloud"></i> Variação Nuvem
+                            </p>
+                            <h3 class="fw-bold {% if variacao_media['nuvem'] < 0 %}text-success{% elif variacao_media['nuvem'] <= 10 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ "%.1f"|format(variacao_media['nuvem']) }}%
+                            </h3>
+                        </div>
+                        <div class="text-muted" style="font-size: 2.5rem; opacity: 0.2;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico Detalhado -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-history"></i> Histórico - Últimos 6 Meses
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mês</th>
+                            <th class="text-center">Categoria</th>
+                            <th class="text-end">Orçado</th>
+                            <th class="text-end">Realizado</th>
+                            <th class="text-end">Diferença</th>
+                            <th class="text-center">Variação %</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mes_str, orcamentos_mes in historico.items() %}
+                            {% set parts = mes_str.split('-') %}
+                            {% set primeira_linha = True %}
+                            {% for categoria in ['software', 'hardware', 'nuvem'] %}
+                                {% if categoria in orcamentos_mes %}
+                                    {% set orcamento = orcamentos_mes[categoria] %}
+                            <tr>
+                                {% if primeira_linha %}
+                                    <td rowspan="3" class="align-middle" style="border-right: 2px solid var(--primary-color); font-weight: bold;">
+                                        {{ nomes_meses[parts[1]|int] }}/{{ parts[0] }}
+                                    </td>
+                                    {% set primeira_linha = False %}
+                                {% endif %}
+                                <td class="text-center">
+                                    {% if categoria == 'software' %}
+                                        <span class="badge bg-info"><i class="fas fa-laptop"></i> Software</span>
+                                    {% elif categoria == 'hardware' %}
+                                        <span class="badge bg-secondary"><i class="fas fa-desktop"></i> Hardware</span>
+                                    {% else %}
+                                        <span class="badge bg-success"><i class="fas fa-cloud"></i> Nuvem</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">R$ {{ "%.2f"|format(orcamento.orcado) }}</td>
+                                <td class="text-end">R$ {{ "%.2f"|format(orcamento.realizado) }}</td>
+                                <td class="text-end">
+                                    {% set diferenca = orcamento.realizado - orcamento.orcado %}
+                                    <span {% if diferenca < 0 %}class="text-success"{% elif diferenca <= (orcamento.orcado * 0.1) %}class="text-warning"{% else %}class="text-danger"{% endif %}>
+                                        {% if diferenca < 0 %}
+                                            -R$ {{ "%.2f"|format(-diferenca) }}
+                                        {% else %}
+                                            +R$ {{ "%.2f"|format(diferenca) }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge {% if orcamento.variacao_percentual() < 0 %}bg-success{% elif orcamento.variacao_percentual() <= 10 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                        {{ "%.1f"|format(orcamento.variacao_percentual()) }}%
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {% if orcamento.status_orcamento() == 'saudavel' %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Saudável</span>
+                                    {% elif orcamento.status_orcamento() == 'normal' %}
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Normal</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Alerta</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Legenda -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-key"></i> Legenda de Status</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Saudável</span>
+                            <span class="text-muted">- Gastou menos que o planejado</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Normal</span>
+                            <span class="text-muted">- Pequeno desvio (até 10%)</span>
+                        </li>
+                        <li>
+                            <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Alerta</span>
+                            <span class="text-muted">- Extrapolou o orçamento (acima de 10%)</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-info-circle"></i> Informações</h6>
+                    <p class="text-muted small mb-0">
+                        Este relatório mostra os últimos 6 meses de orçamento vs realizado por categoria. 
+                        Use estes dados para ajustar seus orçamentos futuros e melhorar o controle financeiro.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('visualizar_orcamento') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-arrow-left"></i> Voltar ao Orçamento
+        </a>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-left: 4px solid var(--primary-color);
+        border-right: none;
+        border-top: none;
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Inventário de Equipamentos{% endblock %}
+{% block content %}
+<div class="container-main">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h1 class="display-6 fw-bold"><i class="fas fa-desktop"></i> Inventário de Equipamentos de TI</h1>
+        <a href="{{ url_for('adicionar_equipamento') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Novo Equipamento</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Nº Série</th>
+                            <th>Status</th>
+                            <th>Localização</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipamentos %}
+                        <tr>
+                            <td>{{ eq.nome }}</td>
+                            <td>{{ eq.tipo }}</td>
+                            <td>{{ eq.marca }}</td>
+                            <td>{{ eq.modelo }}</td>
+                            <td>{{ eq.numero_serie }}</td>
+                            <td>{{ eq.status }}</td>
+                            <td>{{ eq.localizacao }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_equipamento', id=eq.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <a href="{{ url_for('excluir_equipamento', id=eq.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Excluir este equipamento?')"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

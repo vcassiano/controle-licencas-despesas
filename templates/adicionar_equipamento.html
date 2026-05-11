@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Adicionar Equipamento{% endblock %}
+{% block content %}
+<div class="container-main">
+    <h2 class="mb-4"><i class="fas fa-plus"></i> Adicionar Equipamento</h2>
+    <form method="post">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tipo</label>
+                <input type="text" name="tipo" class="form-control" required placeholder="notebook, desktop, etc">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Marca</label>
+                <input type="text" name="marca" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Modelo</label>
+                <input type="text" name="modelo" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nº Série</label>
+                <input type="text" name="numero_serie" class="form-control">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Data de Aquisição</label>
+                <input type="date" name="data_aquisicao" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="ativo">Ativo</option>
+                    <option value="emprestado">Emprestado</option>
+                    <option value="manutencao">Manutenção</option>
+                    <option value="baixado">Baixado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Localização</label>
+                <input type="text" name="localizacao" class="form-control">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Observações</label>
+            <textarea name="observacoes" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button>
+        <a href="{{ url_for('listar_equipamentos') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

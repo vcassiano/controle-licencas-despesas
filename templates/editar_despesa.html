@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <h1 class="text-white">
+            <i class="fas fa-edit"></i> Editar Despesa
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Atualize os dados da despesa</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Categoria</label>
+                        <select class="form-select" name="categoria" required>
+                            <option value="software" {% if despesa.categoria == 'software' %}selected{% endif %}>Software</option>
+                            <option value="hardware" {% if despesa.categoria == 'hardware' %}selected{% endif %}>Hardware</option>
+                            <option value="nuvem" {% if despesa.categoria == 'nuvem' %}selected{% endif %}>Nuvem</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Valor (R$)</label>
+                        <input type="number" step="0.01" class="form-control" name="valor" value="{{ despesa.valor }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Data</label>
+                        <input type="date" class="form-control" name="data" value="{{ despesa.data.strftime('%Y-%m-%d') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <input type="text" class="form-control" name="descricao" value="{{ despesa.descricao }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Orçamento Anual (R$)</label>
+                        <input type="number" step="0.01" class="form-control" name="orcamento_anual" value="{{ despesa.orcamento_anual }}" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Atualizar Despesa
+                        </button>
+                        <a href="/despesas" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

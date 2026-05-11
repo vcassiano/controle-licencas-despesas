@@ -1,0 +1,170 @@
+<!-- File removed as per request -->
+{% extends "base.html" %}
+
+{% block title %}Detalhes OPEX/CAPEX{% endblock %}
+
+{% block content %}
+<div class="container-main">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Cabeçalho -->
+            <div class="mb-4">
+                <a href="{{ url_for('orcamento_opex_capex') }}" class="text-decoration-none mb-3 d-inline-block">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <h1 class="display-6 fw-bold">
+                    <i class="fas fa-file-alt"></i> Detalhes do Orçamento
+                </h1>
+            </div>
+
+            <!-- Card Principal -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                {% if registro.tipo == 'CAPEX' %}
+                                    <span class="badge bg-info">CAPEX</span>
+                                {% else %}
+                                    <span class="badge bg-success">OPEX</span>
+                                {% endif %}
+                                {{ registro.descricao_item }}
+                            </h5>
+                        </div>
+                        <div>
+                            <span class="text-muted">Ano {{ registro.ano }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Informações Gerais -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Informações Gerais</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Fornecedor:</dt>
+                                <dd class="col-sm-7">{{ registro.fornecedor or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Responsável:</dt>
+                                <dd class="col-sm-7">{{ registro.responsavel or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Categoria Macro:</dt>
+                                <dd class="col-sm-7">{{ registro.categoria_macro or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Subcategoria:</dt>
+                                <dd class="col-sm-7">{{ registro.subcategoria or "—" }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Classificação</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Área:</dt>
+                                <dd class="col-sm-7">{{ registro.area or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Centro de Custo:</dt>
+                                <dd class="col-sm-7">{{ registro.centro_custo or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Natureza:</dt>
+                                <dd class="col-sm-7">{{ registro.natureza or "—" }}</dd>
+                                
+                                <dt class="col-sm-5">Status:</dt>
+                                <dd class="col-sm-7">
+                                    <span class="badge bg-secondary">{{ registro.status or "—" }}</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Observação -->
+                    {% if registro.observacao %}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-sticky-note"></i> Observação
+                        </h6>
+                        <p class="mb-0">{{ registro.observacao }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Resumo Anual -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted">Total Orçado</small>
+                                <h4 class="fw-bold text-primary">{{ registro.total_orcado|brl }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted">Total Realizado</small>
+                                <h4 class="fw-bold text-success">{{ registro.total_realizado|brl }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted">Variação</small>
+                                <h4 class="fw-bold {% if registro.delta_total < 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {% if registro.delta_total < 0 %}
+                                        -{{ (-registro.delta_total)|brl }}
+                                    {% else %}
+                                        +{{ registro.delta_total|brl }}
+                                    {% endif %}
+                                </h4>
+                                <small class="{% if registro.variacao_percentual_total < 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ "%.1f"|format(registro.variacao_percentual_total) }}%
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela Mensal -->
+                    <h6 class="fw-bold mb-3">Desempenho Mensal</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mês</th>
+                                    <th class="text-end">Orçado</th>
+                                    <th class="text-end">Realizado</th>
+                                    <th class="text-end">Delta</th>
+                                    <th class="text-center">Variação %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mes in meses_dados %}
+                                <tr>
+                                    <td><strong>{{ mes.mes }}</strong></td>
+                                    <td class="text-end">{{ mes.orcado|brl }}</td>
+                                    <td class="text-end">{{ mes.realizado|brl }}</td>
+                                    <td class="text-end">
+                                        <span class="{% if mes.delta < 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if mes.delta < 0 %}
+                                                -{{ (-mes.delta)|brl }}
+                                            {% else %}
+                                                +{{ mes.delta|brl }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge {% if mes.variacao_pct < 0 %}bg-success{% elif mes.variacao_pct <= 10 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                            {{ "%.1f"|format(mes.variacao_pct) }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão Voltar -->
+            <div>
+                <a href="{{ url_for('orcamento_opex_capex') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <h1 class="text-white">
+            <i class="fas fa-certificate"></i> Gerenciamento de Licenças
+        </h1>
+    </div>
+    <div class="col-lg-4 text-lg-end">
+        <a href="/licencas/adicionar" class="btn btn-light btn-lg">
+            <i class="fas fa-plus"></i> Nova Licença
+        </a>
+    </div>
+</div>
+
+{% if licencas %}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-box"></i> Nome</th>
+                        <th><i class="fas fa-calendar"></i> Vencimento</th>
+                        <th><i class="fas fa-dollar-sign"></i> Custo</th>
+                        <th><i class="fas fa-tag"></i> Status</th>
+                        <th><i class="fas fa-cogs"></i> Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for licenca in licencas %}
+                    <tr>
+                        <td><strong>{{ licenca.nome }}</strong></td>
+                        <td>
+                            <span class="{% if (licenca.data_vencimento - now).days <= 30 and licenca.status == 'ativa' %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                {{ licenca.data_vencimento.strftime('%d/%m/%Y') }}
+                            </span>
+                        </td>
+                        <td>{{ licenca.custo|brl }}</td>
+                        <td>
+                            <span class="badge-status badge-{{ licenca.status }}">
+                                {% if licenca.status == 'ativa' %}
+                                    <i class="fas fa-check-circle"></i> Ativa
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i> Expirada
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/licencas/editar/{{ licenca.id }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="/licencas/excluir/{{ licenca.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza?')">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">Nenhuma licença registrada. <a href="/licencas/adicionar">Adicione uma agora!</a></p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
